@@ -30,6 +30,7 @@ export class SquadComponent implements OnInit {
     submitted:boolean = false;
     postSquadResponse: string;
     errorMessage: string;
+    @Input() currentWeek: number;
 
   constructor(private _homeService: HomeService) {
    
@@ -43,7 +44,7 @@ this.addedPlayer = null;
 
   }
 ngOnInit(): any{
-    console.log('IN  OnInit');
+    console.log('IN  OnInit CURRENT WEEK: ' + this.currentWeek);
     this.getCurrentEntry();
      
 
