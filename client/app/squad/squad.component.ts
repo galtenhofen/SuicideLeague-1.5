@@ -4,6 +4,7 @@ import { IPlayer } from '../players/player';
 import {HomeService} from '../home/home.service';
 //import {AppService} from '../app.service';
 import { Subscription }   from 'rxjs/Subscription';
+import globalVars = require('../global/globals');
 
 @Component({
     moduleId: module.id,
@@ -30,11 +31,12 @@ export class SquadComponent implements OnInit {
     submitted:boolean = false;
     postSquadResponse: string;
     errorMessage: string;
-    @Input() currentWeek: number;
+    currentWeek: number;
 
   constructor(private _homeService: HomeService) {
    
 this.addedPlayer = null;
+this.currentWeek = 0;
 
   this.subscription = _homeService.addPlayer$.subscribe(
      player => { 
@@ -42,9 +44,13 @@ this.addedPlayer = null;
 
     });
 
+this.currentWeek = this._homeService.getWeek();
+                
+
+
   }
 ngOnInit(): any{
-    console.log('IN  OnInit CURRENT WEEK: ' + this.currentWeek);
+    console.log('IN  OnInit of Squad Component CURRENT WEEK: ' + this.currentWeek );
     this.getCurrentEntry();
      
 
@@ -72,7 +78,7 @@ ngOnInit(): any{
 
     getCurrentEntry(){
         // LOCAL API
-           this._homeService.getSquad("5")
+           this._homeService.getSquad()
                 .subscribe(
                     response => this.currentEntry = response,
                     error => this.errorMessage = <any>error,
@@ -205,31 +211,38 @@ console.log('IN removeFromArray  Found player at index: ' + index);
 
   onSubmitTeam(squad:ISquad): void{
         console.log('IN onSubmitTeam');
-this.submitted = true;
+   
 
-    this.squad = {
-        week: 3, 
-        user: "admin",
-        id: "admin-3-2016",
-        QB: this.QB,
-        RB1: this.RB1,
-        RB2: this.RB2,
-        WR1: this.WR1,
-        WR2: this.WR2,
-        WR3: this.WR3,
-        TE: this.TE,
-        FLX: this.FLX,
-        DEF: this.DEF
-        }    
+        this.squad = {
+            week: this.currentWeek, 
+            user: "admin",
+            id: "admin-" +this.currentWeek +"-2016",
+            QB: this.QB,
+            RB1: this.RB1,
+            RB2: this.RB2,
+            WR1: this.WR1,
+            WR2: this.WR2,
+            WR3: this.WR3,
+            TE: this.TE,
+            FLX: this.FLX,
+            DEF: this.DEF
+            }    
 
-//this._homeService.addSquad(this.squad);
-
-this._homeService.setSquad(this.squad)
- .subscribe(
-            data => this.postSquadResponse = JSON.stringify(data), 
-            error => this.errorMessage = <any>error);
-     //console.log('Your Team: ' + JSON.stringify(this.squad));
-
+            if(this.submitted == false){
+                //Team has not been submitted for the week, CALL setSquad
+                this.submitted = true;
+            this._homeService.setSquad(this.squad)
+            .subscribe(
+                        data => this.postSquadResponse = JSON.stringify(data), 
+                        error => this.errorMessage = <any>error);
+            }
+            else{
+                //Team has been submitted for the week, call updateSquad
+                this._homeService.updateSquad(this.squad)
+            .subscribe(
+                        data => this.postSquadResponse = JSON.stringify(data), 
+                        error => this.errorMessage = <any>error);
+            }
   }
 
   canEnableSubmit(): void{
@@ -255,13 +268,25 @@ console.log("In canEnableSubmit   editbutton:  "+   document.getElementById('edi
   }
 
   onRequestComplete(){
+       console.log("In onRequestComplete:  currentEntry: " + this.currentEntry); 
 
-      console.log("In onRequestComplete:  Request Completed"); 
-    //this.loading = this._homeService.loading;
-    //this.offense = [];
-
-     //this.offense = this.players.filter(player => player.position != "DB" && player.position != "DL" && player.position != "LB" && player.position != "K");
-
+      if(this.currentEntry != null){
+          console.log("In onRequestComplete: Entry Exists - Assigning Positions"); 
+      this.QB = this.currentEntry.QB;
+      this.RB1 = this.currentEntry.RB1;
+      this.RB2 = this.currentEntry.RB2;
+      this.WR1 = this.currentEntry.WR1;
+      this.WR2 = this.currentEntry.WR2;
+      this.WR3 = this.currentEntry.WR3;
+      this.TE = this.currentEntry.TE;
+      this.FLX = this.currentEntry.FLX;
+      this.DEF = this.currentEntry.DEF;
+      this.submitted = true;    
+    }
+      else{
+        console.log("In onRequestComplete:  NO ENTRY");
+         this.submitted = false;
+      }
     }
 
  ngOnDestroy() {

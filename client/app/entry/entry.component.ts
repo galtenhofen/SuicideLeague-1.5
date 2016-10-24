@@ -3,6 +3,7 @@ import { ISquad } from '../squad/squad';
 import { IPlayer } from '../players/player';
 import {HomeService} from '../home/home.service';
 import { Subscription }   from 'rxjs/Subscription';
+import globalVars = require('../global/globals');
 
 @Component({
     moduleId: module.id,
@@ -36,25 +37,18 @@ export class EntryComponent implements OnInit {
   constructor(private _homeService: HomeService) {
 
     this.loading = true;
-          this._homeService.getSquad("5")
+          this._homeService.getSquad()
                 .subscribe(
                     response => this.entry = response,
                     error => this.errorMessage = <any>error,
                     //() => (this.loading = this._orfileService.loading));
                     () => (this.onRequestComplete()));
 
-
-/*   
-this.addedSquad = null;
-
-  this.subscription = _homeService.addSquad$.subscribe(
-     squad=> { 
-       this.addEntry(squad);
-  });*/
+this.currentWeek = this._homeService.getWeek();
   }
 ngOnInit(): any{
-    console.log('IN  OnInit');
-this.currentWeek = this.entry.week;
+    console.log('IN  OnInit for Entry Component.  currentWeek: ' + this.currentWeek);
+   this.setDefaultWeek();
 
     }
 
@@ -73,17 +67,17 @@ this.currentWeek = this.entry.week;
 
  onRequestComplete(){
     this.loading = this._homeService.loading;
-  
     // add up points
+    if(this.entry != null){
     this.totalPoints = +(this.entry.QB.weekPts + this.entry.RB1.weekPts + this.entry.RB2.weekPts + this.entry.WR1.weekPts + this.entry.WR2.weekPts + this.entry.WR3.weekPts + this.entry.FLX.weekPts + this.entry.TE.weekPts + this.entry.DEF.weekPts).toFixed(2);
-    
+    }
+    else{this.totalPoints = 0;}
   }
 
    onSelectWeek(selectedId:any): void{
-        console.log('IN onSelectWeek ');
         console.log('IN onSelectWeek  Week: ' + selectedId);
         this.loading = true;
-          this._homeService.getSquad(selectedId)
+          this._homeService.getPreviousSquad(selectedId)
                 .subscribe(
                     response => this.entry = response,
                     error => this.errorMessage = <any>error,
@@ -91,6 +85,21 @@ this.currentWeek = this.entry.week;
                     () => (this.onRequestComplete()));
    
   }
+
+  setDefaultWeek(){
+                var selection = (this.currentWeek);
+                setTimeout(() => 
+                            {
+                            console.log("SLEEP for a tenth of a second");
+                       console.log('IN setDefaultWeek  selectedIndex:' + selection);
+   
+                        (<HTMLSelectElement>document.getElementById('selectWeek')).selectedIndex = selection;
+                             },
+                            100);
+     
+    
+
+    }
 
 
 

@@ -8,6 +8,7 @@ import {Observable} from 'rxjs/Observable';
 import {Subject} from 'rxjs/Subject';
 
 
+
 @Injectable()
 export class HomeService {
   private _playerUrl = 'http://api.fantasy.nfl.com/v1/players/stats?statType=seasonStats&season=2016&week=5&format=json';
@@ -17,20 +18,24 @@ export class HomeService {
 
   loading:boolean; 
 
-  constructor(private _http: Http){ this.loading=false; }
+  constructor(private _http: Http){ 
+          this.loading=false;
+          }
 
   // Observable string sources
   public addedPlayer = new Subject<IPlayer>();
-  //public addedSquad = new Subject<ISquad>();
+  public currentWeek = new Subject<number>();
 
+  currentWeak: number;
 
 //Removing to use local DB
   currentEntry:ISquad;
+  week:number;
   //currentEntryJSON:JSON;
 
   // Observable string streams
   addPlayer$ = this.addedPlayer.asObservable();
-  //addSquad$ = this.addedSquad.asObservable();
+  currentWeek$ = this.currentWeek.asObservable();
   
   
   // Service message commands
@@ -40,6 +45,19 @@ export class HomeService {
 
           console.log('addedPlayer: '+ this.addedPlayer);
         }
+
+
+ updateWeek(week: number) {
+        console.log('Updating Week: '+ JSON.stringify(week));
+        this.currentWeek.next(week);
+        
+        //using this until it can be replaced with database calls
+        this.week = week;
+
+        console.log('Updating Week FOR REAL: '+ this.week);
+ 
+      }
+
 
 /*  Taking this out to use local DB
   addSquad(squad: ISquad) {
@@ -85,18 +103,42 @@ getEntryDB(): Observable<ISquad>{
                     .catch(this.throwStatus);
  }
 
+ updateSquad(squad:ISquad){
+   console.log('IN setSquad');
+                let postUrl = this._localUrl + '/squads/' + this.week;
+                let body = JSON.stringify(squad);
+                let headers = new Headers({ 'Content-Type': 'application/json' });
+                let options = new RequestOptions({ headers: headers });
+
+                return this._http.put(postUrl , body, options)
+                    .do(data => console.log("POST Response: " + JSON.stringify(data)))
+                    .map(this.checkResponseStatus)
+                    .catch(this.throwStatus);
+ }
 
   getEntry():ISquad{
           return this.currentEntry
           
         } 
 
- getSquad(week:string): Observable<ISquad>{
-          console.log("IN getSquad -   URL: " +this._localUrl+'/squads');
+ getPreviousSquad(week:string): Observable<ISquad>{
+   console.log("IN getSquad - Week parameter passed from somewhere else: " + week);
+          console.log("IN getSquad -   URL: " + this._localUrl +'/squads');
                      return this._http.get(this._localUrl+'/squads/'+week) 
                     .finally( () => this.loading = false)
                     .map((response: Response) => <ISquad>response.json())
-                    .do(data => console.log("IN getSquad:  " + JSON.stringify(data)))
+                    //.do(data => console.log("IN getSquad:  " + JSON.stringify(data)))
+                    .catch(this.throwStatus)
+          
+        } 
+
+ getSquad(): Observable<ISquad>{
+   console.log("IN getSquad - Home Service Week Parameter: " + this.week);
+          console.log("IN getSquad -   URL: " + this._localUrl +'/squads/' + this.week);
+                     return this._http.get(this._localUrl+'/squads/'+ this.week) 
+                    .finally( () => this.loading = false)
+                    .map((response: Response) => <ISquad>response.json())
+                    //.do(data => console.log("IN getSquad:  " + JSON.stringify(data)))
                     .catch(this.throwStatus)
           
         } 
@@ -117,7 +159,7 @@ getEntryDB(): Observable<ISquad>{
                      return this._http.get(this._localUrl+'/players') 
                     .finally( () => this.loading = false)
                     .map((response: Response) => <IPlayer[]>response.json())
-                    .do(data => console.log("IN getPlayers:  " + JSON.stringify(data)))
+                    //.do(data => console.log("IN getPlayers:  " + JSON.stringify(data)))
                     .catch(this.throwStatus)
                     
 
@@ -155,4 +197,82 @@ loadPlayers(players:IPlayer[]){
             return status || {};
         }
 
+
+getWeek(){
+var todayDate = new Date();
+var week1 = new Date("9/13/2016");
+var week2 = new Date("9/20/2016");
+var week3 = new Date("9/27/2016");
+var week4 = new Date("10/04/2016");
+var week5 = new Date("10/11/2016");
+var week6 = new Date("10/18/2016");
+var week7 = new Date("10/25/2016");
+var week8 = new Date("11/01/2016");
+var week9 = new Date("11/08/2016");
+var week10 = new Date("11/15/2016");
+var week11 = new Date("11/22/2016");
+var week12 = new Date("11/29/2016");
+var week13 = new Date("12/06/2016");
+var week14 = new Date("11/13/2016");
+var week15 = new Date("11/20/2016");
+var week16 = new Date("11/27/2016");
+var week17 = new Date("01/03/2017");
+
+
+if (todayDate < week1){
+    this.currentWeak = 1;
+}
+else if (todayDate < week2){
+    this.currentWeak = 2;
+}
+else if (todayDate < week3){
+    this.currentWeak = 3;
+}
+else if (todayDate < week4){
+    this.currentWeak = 4;
+}
+else if (todayDate < week5){
+    this.currentWeak = 5;
+}
+else if (todayDate < week6){
+    this.currentWeak = 6;
+}
+else if (todayDate < week7){
+    this.currentWeak = 7;
+}
+else if (todayDate < week8){
+    this.currentWeak = 8;
+}
+else if (todayDate < week9){
+    this.currentWeak = 9;
+}
+else if (todayDate < week10){
+    this.currentWeak = 10;
+}
+else if (todayDate < week11){
+    this.currentWeak = 11;
+}
+else if (todayDate < week12){
+    this.currentWeak = 12;
+}
+else if (todayDate < week13){
+    this.currentWeak = 13;
+}
+else if (todayDate < week14){
+    this.currentWeak = 14;
+}
+else if (todayDate < week2){
+    this.currentWeak = 15;
+}
+else if (todayDate < week2){
+    this.currentWeak = 16;
+}
+else if (todayDate < week2){
+    this.currentWeak = 17;
+}
+
+console.log('IN calculateWeek Home Service.  Welcome to week ' + this.currentWeak);
+return this.currentWeak;
+
+}
 }

@@ -543,7 +543,7 @@ module.exports.addSquad = function(squad, callback){
 
 // Update Squad
 module.exports.updateSquad = function(id, squad, options, callback){
-	var query = {_id: id};
+	var query = {week: id};
 	var update = {
 		QB: squad.QB,
 		RB1: squad.RB1,

@@ -130,8 +130,8 @@ app.post('/api/squads', function(req, res){
 	});
 });
 
-app.put('/api/squads/:_id', function(req, res){
-	var id = req.params._id;
+app.put('/api/squads/:week', function(req, res){
+	var id = req.params.week;
 	var squad = req.body;
 	Squad.updateSquad(id, squad, {}, function(err, squad){
 		if(err){

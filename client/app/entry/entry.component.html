@@ -5,13 +5,13 @@
                 <thead id="topFilters">
 
                     <tr id="topRow">
-                  <th><select class='form-control' name ="week" form = "weekForm" [(ngModel)]='weekFilter' placeholder="Week" (change)="onSelectWeek($event.target.value)" default = "5">
-                    <option value="" disabled selected>{{currentWeek}}</option>
+                  <th><select selected = 'Week 5' id = 'selectWeek' class='form-control' [(ngModel)]='weekFilter' (change)="onSelectWeek($event.target.value)">
+                    <option value="" disabled>Choose Week </option>
                     <option value="1">Week 1</option>
                     <option value="2">Week 2</option>
                     <option value="3">Week 3</option>
                     <option value="4">Week 4</option>
-                    <option value="5">Week 5</option>
+                    <option value="5" selected>Week 5</option>
                     <option value="6">Week 6</option>
                     <option value="7">Week 7</option>
                     <option value="8">Week 8</option>

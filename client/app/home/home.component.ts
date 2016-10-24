@@ -7,7 +7,7 @@ import {ISquad}  from '../squad/squad';
 import { IPlayer } from '../players/player';
 import { Subscription }   from 'rxjs/Subscription';
 import {HomeService} from '../home/home.service';
-
+//import globalVars = require('../global/globals');
 
 @Component({
      moduleId: module.id,
@@ -62,6 +62,7 @@ constructor(private _homeService: HomeService) {
 
 
 ngOnInit(): any{
+console.log('IN OnInit for Home Component.');
 this.viewController = "Home";
 this.calculateWeek();
 
@@ -204,6 +205,10 @@ else if (todayDate < week2){
 else if (todayDate < week2){
     this.currentWeek = 17;
 }
+
+console.log('IN calculateWeek.  Welcome to week ' + this.currentWeek);
+
+this._homeService.updateWeek(this.currentWeek);
 
 }
 
